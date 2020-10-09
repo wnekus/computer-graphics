@@ -120,7 +120,7 @@
                // Parameter 5 'openEnded': Allows to have open ends ('true') or closed ends ('false') 
                //                          of the cylindern. Since the pyramid shall have a bottom 
                //                          face, we set it to 'false'. 
-               var pyramidGeometry = new THREE.CylinderGeometry(0.0, 1.5, 1.5, 4, false); 
+               var pyramidGeometry = new THREE.CylinderGeometry(0.5, 1.5, 1.5, 100, false); 
 
                // Coloring the faces with vertex colors is a bit tricky, but allows us to see how to 
                // loop through the faces and check whether they have three or four vertices. 
@@ -135,18 +135,18 @@
                // Three.js: 49). 
                for(i = 0; i < pyramidGeometry.faces.length; i++){ 
                    if(pyramidGeometry.faces[i] instanceof THREE.Face4){ 
-                       pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000); 
+                       pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF4C94); 
                        if((i % 2) == 0){ 
-                           pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00); 
+                           pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x7FE5F0); 
                            pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF); 
                        } else { 
                            pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x0000FF); 
-                           pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x00FF00); 
+                           pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x7FE5F0); 
                        } 
-                       pyramidGeometry.faces[i].vertexColors[3] = new THREE.Color(0xFF0000); 
+                       pyramidGeometry.faces[i].vertexColors[3] = new THREE.Color(0xFF4C94); 
                    } else { 
-                       pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000); 
-                       pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00); 
+                       pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF4C94); 
+                       pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x7FE5F0); 
                        pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF); 
                    } 
                } 
