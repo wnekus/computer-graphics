@@ -32,6 +32,9 @@ This three.js demo is part of a collection at
 <!-- ------------------------------------------------------------ -->
 
 <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+
+<h4 style="position: absolute; left:50px; top:0px; color:white">Press Z or X to move cube mirror</h4>
+
 <script>
 /*
 	Three.js "tutorials by example"
@@ -49,6 +52,12 @@ var clock = new THREE.Clock();
 // custom global variables
 var mirrorCube, mirrorCubeCamera; // for mirror material
 var mirrorSphere, mirrorSphereCamera; // for mirror material
+
+// my own global variables
+var mirrorSphere2, mirrorSphereCamera2;
+var torusKnot;
+var sphereMove = -3;
+var sphereMove2 = 3;
 
 init();
 animate();
@@ -89,7 +98,7 @@ function init()
 	light.position.set(0,250,0);
 	scene.add(light);
 	// FLOOR
-	var floorTexture = new THREE.TextureLoader().load( 'textures/stone.jpg' );
+	var floorTexture = new THREE.TextureLoader().load( 'textures/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 5, 5 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side:THREE.BackSide } );
@@ -101,12 +110,12 @@ function init()
 	
 	// SKYBOX/FOG
 	var materialArray = [];
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/dawnmountain-xpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/dawnmountain-xneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/dawnmountain-ypos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/dawnmountain-yneg.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/dawnmountain-zpos.png' ) }));
-	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/dawnmountain-zneg.png' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/DarkSea-xpos.jpg' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/DarkSea-xneg.jpg' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/DarkSea-ypos.jpg' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/DarkSea-yneg.jpg' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/DarkSea-zpos.jpg' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/DarkSea-zneg.jpg' ) }));
 	for (var i = 0; i < 6; i++)
 	   materialArray[i].side = THREE.BackSide;
 	var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
@@ -117,31 +126,96 @@ function init()
 	////////////
 	// CUSTOM //
 	////////////
-	
-		
 	var cubeGeom = new THREE.CubeGeometry(200, 200, 30,1,1,1);
-	mirrorCubeCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
-	// mirrorCubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+	// var cubeGeom = new THREE.CubeGeometry(200, 200, 30,1000,1,1);
+	// var cubeGeom = new THREE.BoxGeometry(200, 200, 30,1,1,1);
+	// var cubeGeom = new THREE.BoxGeometry(200, 200, 30,1000,1,1);
+	mirrorCubeCamera = new THREE.CubeCamera( 0.1, 5000, 2048 );
+	// mirrorCubeCamera = new THREE.CubeCamera( 300, 500, 2048 );
+	// CubeCamera( near : Number, far : Number, resolution : Number )
+	// Near and far are used to define how close and how far the camera is able to see.
+	// (Objects with a distance from the camera smaller or greater than near and far respectively won’t be rendered).
+    // Resolution basically defines the resolution of the image. The higher the resolution the heavier the rendering will be
 	scene.add( mirrorCubeCamera );
 	var mirrorCubeMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorCubeCamera.renderTarget } );
 	mirrorCube = new THREE.Mesh( cubeGeom, mirrorCubeMaterial );
-	mirrorCube.position.set(-75,50,0);
+	mirrorCube.position.set(200,100,0);
 	//mirrorCubeCamera.position = mirrorCube.position;    not working with new three.js
-	mirrorCubeCamera.position.set(-75,50,0);
+	mirrorCubeCamera.position.set(200,100,0);
 	scene.add(mirrorCube);	
 	
-	var sphereGeom =  new THREE.SphereGeometry( 50, 32, 16 ); // radius, segmentsWidth, segmentsHeight
+	var sphereGeom =  new THREE.SphereGeometry( 100, 32, 16 ); // radius, segmentsWidth, segmentsHeight
 	mirrorSphereCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
 	// mirrorCubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
 	scene.add( mirrorSphereCamera );
-	var mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorSphereCamera.renderTarget } );
+	var mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: mirrorSphereCamera.renderTarget, opacity: 0.5, transparent: true  } );
 	mirrorSphere = new THREE.Mesh( sphereGeom, mirrorSphereMaterial );
-	mirrorSphere.position.set(75,50,0);
+	mirrorSphere.position.set(300,100,-400);
 	//mirrorSphereCamera.position = mirrorSphere.position;
-	mirrorSphereCamera.position.set(75,50,0);
+	mirrorSphereCamera.position.set(300,100,-400);
 	scene.add(mirrorSphere);
 
+	//////////////
+	// OWN CODE //
+	//////////////
+
+	torusKnot = createMesh(new THREE.TorusKnotGeometry( 50, 15, 100, 16 ), "floor-wood.jpg");
+	torusKnot.position.set(-100,80,150)
+    scene.add(torusKnot);
+
+	var sphere = createMesh(new THREE.SphereGeometry(30, 20, 20), "weave.jpg", "weave-bump.jpg");
+	sphere.position.set(200,30,300)
+	torusKnot.rotation.y = 0.5;
+    scene.add(sphere);
+
+	var sphere2 = createMesh2(new THREE.SphereGeometry(30, 20, 20), "plaster.jpg", "plaster-normal.jpg");
+    sphere2.rotation.y = 0.5;
+    sphere2.position.set(120,30,300)
+    scene.add(sphere2);
+
+	mirrorSphereCamera2 = new THREE.CubeCamera( 0.1, 5000, 512 );
+	// mirrorCubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+	scene.add( mirrorSphereCamera2 );
+	var mirrorSphereMaterial2 = new THREE.MeshBasicMaterial( { envMap: mirrorSphereCamera2.renderTarget} );
+	mirrorSphereMaterial2.blendDstAlpha = 100;
+	mirrorSphere2 = new THREE.Mesh( sphereGeom, mirrorSphereMaterial2 );
+	mirrorSphere2.position.set(-300,100,-400);
+	//mirrorSphereCamera.position = mirrorSphere.position;
+	mirrorSphereCamera2.position.set(-300,100,-400);
+	scene.add(mirrorSphere2);
 }
+
+function createMesh(geom, imageFile, bump) {
+    var texture = THREE.ImageUtils.loadTexture("textures/" + imageFile)
+    geom.computeVertexNormals();
+    var mat = new THREE.MeshPhongMaterial();
+    mat.map = texture;
+
+    if (bump) {
+        var bump = THREE.ImageUtils.loadTexture("textures/" + bump)
+        mat.bumpMap = bump;
+        mat.bumpScale = 0.6;
+    }
+
+
+    // create a multimaterial
+    var mesh = new THREE.Mesh(geom, mat);
+
+    return mesh;
+}
+
+function createMesh2(geom, imageFile, normal) {
+	var t = THREE.ImageUtils.loadTexture("textures/" + imageFile);
+	var m = THREE.ImageUtils.loadTexture("textures/" + normal);
+
+	var mat2 = new THREE.MeshPhongMaterial({
+		map: t, normalMap: m
+	});
+
+	var mesh = new THREE.Mesh(geom, mat2);
+	return mesh;
+}
+
 
 function animate() 
 {
@@ -154,7 +228,11 @@ function update()
 {
 	if ( keyboard.pressed("z") ) 
 	{ 
-		// do something
+		mirrorCube.rotation.y += 0.01;
+	}
+	if ( keyboard.pressed("x") ) 
+	{ 
+		mirrorCube.rotation.y -= 0.01;
 	}
 	
 	controls.update();
@@ -163,6 +241,9 @@ function update()
 
 function render() 
 {
+	torusKnot.rotation.x += 0.1;
+	moveSphere();
+	moveSphere2();
 	// move the CubeCamera to the position of the object
 	//    that has a reflective surface, "take a picture" in each direction
 	//    and apply it to the surface.
@@ -176,11 +257,39 @@ function render()
 	mirrorSphereCamera.updateCubeMap( renderer, scene );
 	mirrorSphere.visible = true;
 
+	mirrorSphere2.visible = false;
+	mirrorSphereCamera2.updateCubeMap( renderer, scene );
+	mirrorSphere2.visible = true;
+
     //torus.visible = false;
 	//mirrorTorusCamera.updateCubeMap( renderer, scene );
 	//torus.visible = true;
 	
 	renderer.render( scene, camera );
+}
+
+function moveSphere(){
+    mirrorSphere.position.x +=sphereMove;
+	mirrorSphereCamera.position.x +=sphereMove;
+                
+	if (mirrorSphere.position.x > 300) {
+		sphereMove = -3;  
+    }
+    if (mirrorSphere.position.x < 100) {
+		sphereMove = 3;
+    }
+}
+
+function moveSphere2(){
+    mirrorSphere2.position.x +=sphereMove2;
+	mirrorSphereCamera2.position.x +=sphereMove2;
+                
+	if (mirrorSphere2.position.x > -100) {
+		sphereMove2 = -3;  
+    }
+    if (mirrorSphere2.position.x < -300) {
+		sphereMove2 = 3;
+    }
 }
 
 </script>
